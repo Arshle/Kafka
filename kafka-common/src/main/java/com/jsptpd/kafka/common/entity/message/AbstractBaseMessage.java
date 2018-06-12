@@ -7,7 +7,9 @@
 package com.jsptpd.kafka.common.entity.message;
 
 import com.alibaba.fastjson.JSON;
+import com.jsptpd.kafka.common.code.message.KafkaMessageType;
 import com.jsptpd.kafka.common.intf.message.KafkaMessage;
+import java.util.Date;
 
 /**
  * 〈kafka消息基础类〉<br>
@@ -25,7 +27,11 @@ public abstract class AbstractBaseMessage<T> implements KafkaMessage<T> {
     /**
      * 消息类型
      */
-    private int messageType;
+    private KafkaMessageType messageType;
+    /**
+     * 创建时间
+     */
+    private Date creationTime = new Date();
     /**
      * Getters、Setters
      */
@@ -37,12 +43,20 @@ public abstract class AbstractBaseMessage<T> implements KafkaMessage<T> {
         this.messageId = messageId;
     }
 
-    public int getMessageType() {
+    public KafkaMessageType getMessageType() {
         return messageType;
     }
 
-    public void setMessageType(int messageType) {
+    public void setMessageType(KafkaMessageType messageType) {
         this.messageType = messageType;
+    }
+
+    public Date getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(Date creationTime) {
+        this.creationTime = creationTime;
     }
 
     @Override

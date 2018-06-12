@@ -22,16 +22,16 @@ public interface KafkaMessage<T> {
      * @param propertyName 属性名称
      * @param propertyValue 属性内容
      */
-    void addMessageProperties(String propertyName,T propertyValue);
+    void addProperty(String propertyName,T propertyValue);
     /**
      * 获取消息属性
      * @param propertyName 属性名称
      * @return 属性内容
      */
-    T getMessageProperty(String propertyName);
+    T getProperty(String propertyName);
     /**
      * 获取消息属性
      * @return 消息属性
      */
-    Map<String,T> messageProperties();
+    Map<String,T> getProperties();
 }

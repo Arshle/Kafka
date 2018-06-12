@@ -29,7 +29,7 @@ public class BaseSimpleMessage<T> extends AbstractBaseMessage<T> {
      * @param propertyValue 属性内容
      */
     @Override
-    public void addMessageProperties(String propertyName, T propertyValue) {
+    public void addProperty(String propertyName, T propertyValue) {
         if(StringUtils.isEmpty(propertyName) || propertyValue == null){
             return;
         }
@@ -41,7 +41,7 @@ public class BaseSimpleMessage<T> extends AbstractBaseMessage<T> {
      * @return 属性内容
      */
     @Override
-    public T getMessageProperty(String propertyName) {
+    public T getProperty(String propertyName) {
         if(StringUtils.isEmpty(propertyName)){
             return null;
         }
@@ -52,7 +52,7 @@ public class BaseSimpleMessage<T> extends AbstractBaseMessage<T> {
      * @return 消息属性
      */
     @Override
-    public Map<String, T> messageProperties() {
-        return this.properties;
+    public Map<String, T> getProperties() {
+        return properties;
     }
 }
