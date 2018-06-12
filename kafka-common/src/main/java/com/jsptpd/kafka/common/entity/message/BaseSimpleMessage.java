@@ -22,7 +22,7 @@ public class BaseSimpleMessage<T> extends AbstractBaseMessage<T> {
     /**
      * 消息属性
      */
-    Map<String,T> properties = new HashMap<>(1);
+    private Map<String,T> properties = new HashMap<>(1);
     /**
      * 新增消息属性
      * @param propertyName 属性名称

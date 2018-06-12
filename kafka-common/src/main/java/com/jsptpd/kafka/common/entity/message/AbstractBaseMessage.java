@@ -21,11 +21,11 @@ public abstract class AbstractBaseMessage<T> implements KafkaMessage<T> {
     /**
      * 消息编号
      */
-    public long messageId;
+    private long messageId;
     /**
      * 消息类型
      */
-    public int messageType;
+    private int messageType;
     /**
      * Getters、Setters
      */

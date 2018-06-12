@@ -18,9 +18,21 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <junit.version>4.11</junit.version>
     <fastjson.version>1.2.44</fastjson.version>
+    <kafka.version>0.10.1.1</kafka.version>
   </properties>
   <!--dependencies-->
   <dependencies>
+    <!--kafka-->
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka_2.11</artifactId>
+      <version>${kafka.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>${kafka.version}</version>
+    </dependency>
     <!--fastjson-->
     <dependency>
       <groupId>com.alibaba</groupId>

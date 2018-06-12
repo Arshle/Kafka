@@ -23,7 +23,7 @@ public class BaseConcurrencyMessage<T> extends AbstractBaseMessage<T> {
     /**
      * 消息属性
      */
-    ConcurrentMap<String,T> properties = new ConcurrentHashMap<>(1);
+    private ConcurrentMap<String,T> properties = new ConcurrentHashMap<>(1);
     /**
      * 新增消息属性
      * @param propertyName 属性名称
