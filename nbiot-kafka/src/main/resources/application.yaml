@@ -1,8 +1,6 @@
 kafka:
   connect:
     addr: node1:9092,node2:9092,node3:9092
-  key:
-    serializer: org.apache.kafka.common.serialization.StringSerializer
   value:
     serializer: org.apache.kafka.common.serialization.StringSerializer
   topic:

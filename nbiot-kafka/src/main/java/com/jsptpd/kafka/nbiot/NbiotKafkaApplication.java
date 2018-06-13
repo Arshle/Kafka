@@ -8,6 +8,7 @@ package com.jsptpd.kafka.nbiot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * 〈springboot启动类〉<br>
@@ -18,6 +19,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since [产品/模块版本]（可选）
  */
 @SpringBootApplication
+@ComponentScan("com.jsptpd.kafka")
 public class NbiotKafkaApplication {
     public static void main(String[] args) {
         SpringApplication.run(NbiotKafkaApplication.class, args);
