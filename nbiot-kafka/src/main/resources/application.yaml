@@ -1,14 +1,6 @@
 kafka:
   connect:
     addr: node1:9092,node2:9092,node3:9092
-  value:
-    serializer: org.apache.kafka.common.serialization.StringSerializer
-  topic:
-    default: jsptpd-kafka
-  autoFlush: true
 zookeeper:
   connect:
     addr: node1:2181,node2:2181,node3:2181
-    timeout: 30000
-  session:
-    timeout: 30000

@@ -6,6 +6,7 @@
  */
 package com.jsptpd.kafka.common.utils;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
@@ -82,5 +83,13 @@ public class StringUtils {
             }
         }
         return totalLength;
+    }
+    /**
+     * 获取全局唯一的id
+     * @return uuid
+     */
+    public static String getUUID(){
+        String uuid = UUID.randomUUID().toString();
+        return uuid.substring(0,23);
     }
 }
