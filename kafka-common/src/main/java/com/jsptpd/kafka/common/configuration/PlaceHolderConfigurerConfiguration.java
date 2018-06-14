@@ -31,6 +31,7 @@ public class PlaceHolderConfigurerConfiguration {
         final PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
         Resource[] resources = new ClassPathResource[] {
                 new ClassPathResource("classpath:application.yaml"),
+                new ClassPathResource("classpath:application.yml"),
                 new ClassPathResource("classpath:application.properties")};
         configurer.setIgnoreResourceNotFound(true);
         configurer.setLocations(resources);

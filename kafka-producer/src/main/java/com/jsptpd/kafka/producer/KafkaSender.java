@@ -15,10 +15,7 @@ import kafka.admin.AdminUtils;
 import kafka.admin.BrokerMetadata;
 import kafka.server.ConfigType;
 import kafka.utils.ZkUtils;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.security.JaasUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -282,12 +279,15 @@ public class KafkaSender {
         }
         Future<RecordMetadata> future = null;
         try (KafkaProducer<String,String> producer = getProducer()) {
+            String uuid = StringUtils.getUUID();
+            long now = System.currentTimeMillis();
             //构建消息记录
             ProducerRecord<String,String> record = new ProducerRecord<>(topic,
-                    partition, System.currentTimeMillis(), StringUtils.getUUID(), message.toString());
+                    partition, now, uuid, message.toString());
             //发送消息
             if(producer != null){
                 future = producer.send(record);
+                logger.info("发送kafka数据|topic:" + topic + "|partition:" + partition + "|key:" + uuid + "|value:" + message.toString() + "|timestamp:" + now);
             }
         } catch (Exception e) {
             logger.error("发送kafka数据异常",e);
@@ -300,8 +300,17 @@ public class KafkaSender {
      * @param <T> 消息属性类型
      */
     public static <T> void concurrentSend(KafkaMessage<T> message){
+        concurrentSend(message,null);
+    }
+    /**
+     * 并发发送消息
+     * @param message 消息体
+     * @param callback 回调接口
+     * @param <T> 消息属性类型
+     */
+    public static <T> void concurrentSend(KafkaMessage<T> message,Callback callback){
         KafkaProducerConfiguration kafkaConf = SpringUtils.getBean(KafkaProducerConfiguration.class);
-        concurrentSendByPartitions(kafkaConf.getDefaultTopic(),null,message);
+        concurrentSendByPartitions(kafkaConf.getDefaultTopic(),null,message,callback);
     }
     /**
      * 并发发送kafka消息
@@ -313,28 +322,73 @@ public class KafkaSender {
         concurrentSendByPartitions(topic,null,message);
     }
     /**
+     * 并发发送kafka消息
+     * @param topic 主题名称
+     * @param message 消息体
+     * @param callback 回调接口
+     * @param <T> 消息属性类型
+     */
+    public static <T> void concurrentSend(String topic,KafkaMessage<T> message,Callback callback){
+        concurrentSendByPartitions(topic,null,message,callback);
+    }
+    /**
      * 并发指定分区发送kafka消息
-     * @param partitions 分区编号
+     * @param partition 分区编号
      * @param message 消息体
      * @param <T> 消息属性类型
      */
-    public static <T> void concurrentSendByPartitions(Integer partitions,KafkaMessage<T> message){
+    public static <T> void concurrentSendByPartitions(Integer partition,KafkaMessage<T> message){
+        concurrentSendByPartitions(partition,message,null);
+    }
+    /**
+     * 并发指定分区发送kafka消息
+     * @param partition 分区编号
+     * @param message 消息体
+     * @param callback 回调接口
+     * @param <T> 消息属性类型
+     */
+    public static <T> void concurrentSendByPartitions(Integer partition,KafkaMessage<T> message,Callback callback){
         KafkaProducerConfiguration kafkaConf = SpringUtils.getBean(KafkaProducerConfiguration.class);
-        concurrentSendByPartitions(kafkaConf.getDefaultTopic(),partitions,message);
+        concurrentSendByPartitions(kafkaConf.getDefaultTopic(),partition,message,callback);
     }
     /**
      * 并发指定分区发送kafka消息
      * @param topic 主题名称
-     * @param partitions 分区编号
+     * @param partition 分区编号
      * @param message 消息体
      * @param <T> 消息属性类型
      */
-    public static <T> void concurrentSendByPartitions(String topic,Integer partitions,KafkaMessage<T> message){
+    public static <T> void concurrentSendByPartitions(String topic, Integer partition, KafkaMessage<T> message){
+        concurrentSendByPartitions(topic,partition,message,null);
+    }
+    /**
+     * 并发指定分区发送kafka消息
+     * @param topic 主题名称
+     * @param partition 分区编号
+     * @param message 消息体
+     * @param <T> 消息属性类型
+     */
+    public static <T> void concurrentSendByPartitions(String topic, Integer partition, KafkaMessage<T> message, Callback callback){
         if(StringUtils.isEmpty(topic) || message == null){
             logger.warn("kafka主题或消息为空");
             return;
         }
         ThreadPoolExecutor executor = ProducerThreadUtils.getThreadPoolExecutor();
-        executor.execute(() -> sendByPartition(topic,partitions,message));
+        executor.execute(() -> {
+            try (KafkaProducer<String,String> producer = getProducer()) {
+                String uuid = StringUtils.getUUID();
+                long now = System.currentTimeMillis();
+                //构建消息记录
+                ProducerRecord<String,String> record = new ProducerRecord<>(topic,
+                        partition, now, uuid, message.toString());
+                //发送消息
+                if(producer != null){
+                    producer.send(record,callback);
+                    logger.info("发送kafka数据|topic:" + topic + "|partition:" + partition + "|key:" + uuid + "|value:" + message.toString() + "|timestamp:" + now);
+                }
+            } catch (Exception e) {
+                logger.error("发送kafka数据异常",e);
+            }
+        });
     }
 }
