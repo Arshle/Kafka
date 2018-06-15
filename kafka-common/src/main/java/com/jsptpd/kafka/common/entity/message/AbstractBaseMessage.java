@@ -19,7 +19,7 @@ import java.util.Date;
  * @see [相关类/方法]（可选）
  * @since [产品/模块版本]（可选）
  */
-public abstract class AbstractBaseMessage<T> implements KafkaMessage<T> {
+public abstract class AbstractBaseMessage implements KafkaMessage {
     /**
      * 消息编号
      */

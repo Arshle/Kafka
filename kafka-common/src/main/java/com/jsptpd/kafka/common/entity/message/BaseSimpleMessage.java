@@ -18,18 +18,18 @@ import java.util.Map;
  * @see [相关类/方法]（可选）
  * @since [产品/模块版本]（可选）
  */
-public class BaseSimpleMessage<T> extends AbstractBaseMessage<T> {
+public class BaseSimpleMessage extends AbstractBaseMessage {
     /**
      * 消息属性
      */
-    private Map<String,T> properties = new HashMap<>(1);
+    private Map<String,String> properties = new HashMap<>(1);
     /**
      * 新增消息属性
      * @param propertyName 属性名称
      * @param propertyValue 属性内容
      */
     @Override
-    public void addProperty(String propertyName, T propertyValue) {
+    public void addProperty(String propertyName, String propertyValue) {
         if(StringUtils.isEmpty(propertyName) || propertyValue == null){
             return;
         }
@@ -41,7 +41,7 @@ public class BaseSimpleMessage<T> extends AbstractBaseMessage<T> {
      * @return 属性内容
      */
     @Override
-    public T getProperty(String propertyName) {
+    public String getProperty(String propertyName) {
         if(StringUtils.isEmpty(propertyName)){
             return null;
         }
@@ -52,7 +52,7 @@ public class BaseSimpleMessage<T> extends AbstractBaseMessage<T> {
      * @return 消息属性
      */
     @Override
-    public Map<String, T> getProperties() {
+    public Map<String, String> getProperties() {
         return properties;
     }
 }

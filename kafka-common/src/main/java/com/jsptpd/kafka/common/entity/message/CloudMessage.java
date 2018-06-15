@@ -14,7 +14,7 @@ package com.jsptpd.kafka.common.entity.message;
  * @see [相关类/方法]（可选）
  * @since [产品/模块版本]（可选）
  */
-public class CloudMessage extends BaseSimpleMessage<String> {
+public class CloudMessage extends BaseSimpleMessage {
 
     private long id;
     private String branchName;

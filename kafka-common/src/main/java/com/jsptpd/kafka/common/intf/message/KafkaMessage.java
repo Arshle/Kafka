@@ -16,22 +16,22 @@ import java.util.Map;
  * @see [相关类/方法]（可选）
  * @since [产品/模块版本]（可选）
  */
-public interface KafkaMessage<T> {
+public interface KafkaMessage {
     /**
      * 新增消息属性
      * @param propertyName 属性名称
      * @param propertyValue 属性内容
      */
-    void addProperty(String propertyName,T propertyValue);
+    void addProperty(String propertyName,String propertyValue);
     /**
      * 获取消息属性
      * @param propertyName 属性名称
      * @return 属性内容
      */
-    T getProperty(String propertyName);
+    String getProperty(String propertyName);
     /**
      * 获取消息属性
      * @return 消息属性
      */
-    Map<String,T> getProperties();
+    Map<String,String> getProperties();
 }

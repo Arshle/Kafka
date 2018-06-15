@@ -236,10 +236,9 @@ public class KafkaSender {
     /**
      * 发送kafka消息
      * @param message 消息体
-     * @param <T> 消息属性类型
      * @return 发送后的future对象
      */
-    public static <T> Future<RecordMetadata> send(KafkaMessage<T> message){
+    public static Future<RecordMetadata> send(KafkaMessage message){
         KafkaProducerConfiguration kafkaConf = SpringUtils.getBean(KafkaProducerConfiguration.class);
         return send(kafkaConf.getDefaultTopic(),message);
     }
@@ -247,20 +246,18 @@ public class KafkaSender {
      * 发送kafka消息
      * @param topic 主题名称
      * @param message 消息体
-     * @param <T> 消息属性类型
      * @return 发送后的future对象
      */
-    public static <T> Future<RecordMetadata> send(String topic, KafkaMessage<T> message){
+    public static Future<RecordMetadata> send(String topic, KafkaMessage message){
         return sendByPartition(topic, null, message);
     }
     /**
      * 指定分区发送消息
      * @param partition 分区编号
      * @param message 消息体
-     * @param <T> 消息属性类型
      * @return 发送后的future对象
      */
-    public static <T> Future<RecordMetadata> sendByPartition(Integer partition,KafkaMessage<T> message){
+    public static Future<RecordMetadata> sendByPartition(Integer partition,KafkaMessage message){
         KafkaProducerConfiguration kafkaConf = SpringUtils.getBean(KafkaProducerConfiguration.class);
         return sendByPartition(kafkaConf.getDefaultTopic(),partition,message);
     }
@@ -269,10 +266,9 @@ public class KafkaSender {
      * @param topic 主题名称
      * @param partition 分区编号
      * @param message 消息体
-     * @param <T> 消息属性类型
      * @return 发送后的future对象
      */
-    public static <T> Future<RecordMetadata> sendByPartition(String topic,Integer partition,KafkaMessage<T> message){
+    public static Future<RecordMetadata> sendByPartition(String topic,Integer partition,KafkaMessage message){
         if(StringUtils.isEmpty(topic) || message == null){
             logger.warn("kafka主题或消息为空");
             return null;
@@ -297,18 +293,16 @@ public class KafkaSender {
     /**
      * 并发发送kafka消息
      * @param message 消息体
-     * @param <T> 消息属性类型
      */
-    public static <T> void concurrentSend(KafkaMessage<T> message){
+    public static void concurrentSend(KafkaMessage message){
         concurrentSend(message,null);
     }
     /**
      * 并发发送消息
      * @param message 消息体
      * @param callback 回调接口
-     * @param <T> 消息属性类型
      */
-    public static <T> void concurrentSend(KafkaMessage<T> message,Callback callback){
+    public static void concurrentSend(KafkaMessage message,Callback callback){
         KafkaProducerConfiguration kafkaConf = SpringUtils.getBean(KafkaProducerConfiguration.class);
         concurrentSendByPartitions(kafkaConf.getDefaultTopic(),null,message,callback);
     }
@@ -316,9 +310,8 @@ public class KafkaSender {
      * 并发发送kafka消息
      * @param topic 主题名称
      * @param message 消息体
-     * @param <T> 消息属性类型
      */
-    public static <T> void concurrentSend(String topic,KafkaMessage<T> message){
+    public static void concurrentSend(String topic,KafkaMessage message){
         concurrentSendByPartitions(topic,null,message);
     }
     /**
@@ -326,18 +319,16 @@ public class KafkaSender {
      * @param topic 主题名称
      * @param message 消息体
      * @param callback 回调接口
-     * @param <T> 消息属性类型
      */
-    public static <T> void concurrentSend(String topic,KafkaMessage<T> message,Callback callback){
+    public static void concurrentSend(String topic,KafkaMessage message,Callback callback){
         concurrentSendByPartitions(topic,null,message,callback);
     }
     /**
      * 并发指定分区发送kafka消息
      * @param partition 分区编号
      * @param message 消息体
-     * @param <T> 消息属性类型
      */
-    public static <T> void concurrentSendByPartitions(Integer partition,KafkaMessage<T> message){
+    public static void concurrentSendByPartitions(Integer partition,KafkaMessage message){
         concurrentSendByPartitions(partition,message,null);
     }
     /**
@@ -345,9 +336,8 @@ public class KafkaSender {
      * @param partition 分区编号
      * @param message 消息体
      * @param callback 回调接口
-     * @param <T> 消息属性类型
      */
-    public static <T> void concurrentSendByPartitions(Integer partition,KafkaMessage<T> message,Callback callback){
+    public static void concurrentSendByPartitions(Integer partition,KafkaMessage message,Callback callback){
         KafkaProducerConfiguration kafkaConf = SpringUtils.getBean(KafkaProducerConfiguration.class);
         concurrentSendByPartitions(kafkaConf.getDefaultTopic(),partition,message,callback);
     }
@@ -356,9 +346,8 @@ public class KafkaSender {
      * @param topic 主题名称
      * @param partition 分区编号
      * @param message 消息体
-     * @param <T> 消息属性类型
      */
-    public static <T> void concurrentSendByPartitions(String topic, Integer partition, KafkaMessage<T> message){
+    public static void concurrentSendByPartitions(String topic, Integer partition, KafkaMessage message){
         concurrentSendByPartitions(topic,partition,message,null);
     }
     /**
@@ -366,9 +355,8 @@ public class KafkaSender {
      * @param topic 主题名称
      * @param partition 分区编号
      * @param message 消息体
-     * @param <T> 消息属性类型
      */
-    public static <T> void concurrentSendByPartitions(String topic, Integer partition, KafkaMessage<T> message, Callback callback){
+    public static void concurrentSendByPartitions(String topic, Integer partition, KafkaMessage message, Callback callback){
         if(StringUtils.isEmpty(topic) || message == null){
             logger.warn("kafka主题或消息为空");
             return;

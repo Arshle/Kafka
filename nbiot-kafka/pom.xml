@@ -23,6 +23,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <kafka.producer.version>1.0-SNAPSHOT</kafka.producer.version>
+        <kafka.consumer.version>1.0-SNAPSHOT</kafka.consumer.version>
     </properties>
     <!--properties-->
     <dependencies>
@@ -45,6 +46,12 @@
             <groupId>com.jsptpd.kafka</groupId>
             <artifactId>kafka-producer</artifactId>
             <version>${kafka.producer.version}</version>
+        </dependency>
+        <!--kafka-consumer-->
+        <dependency>
+            <groupId>com.jsptpd.kafka</groupId>
+            <artifactId>kafka-consumer</artifactId>
+            <version>${kafka.consumer.version}</version>
         </dependency>
     </dependencies>
     <!--build-->
