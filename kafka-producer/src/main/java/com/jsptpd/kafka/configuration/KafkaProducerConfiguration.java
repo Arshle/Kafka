@@ -138,7 +138,7 @@ public class KafkaProducerConfiguration {
     /**
      * 并发发送消息数量
      */
-    @Value("${kafka.concurrency.send:5}")
+    @Value("${kafka.concurrency.send:3}")
     private int concurrencySend;
     /**
      * Getters、Setters

@@ -134,9 +134,14 @@ public class KafkaConsumerConfiguration {
     @Value("${kafka.value.deserializer:org.apache.kafka.common.serialization.StringDeserializer}")
     private String valueDeserializer;
     /**
+     * kafka默认主题名称
+     */
+    @Value("${kafka.topic.default:jsptpd-kafka}")
+    private String defaultTopic;
+    /**
      * 消费者并发数量
      */
-    @Value("${kafka.concurrency.consumer:5}")
+    @Value("${kafka.concurrency.consumer:3}")
     private int concurrencyConsumer;
     /**
      * 消费者配置
@@ -191,6 +196,14 @@ public class KafkaConsumerConfiguration {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getDefaultTopic() {
+        return defaultTopic;
+    }
+
+    public void setDefaultTopic(String defaultTopic) {
+        this.defaultTopic = defaultTopic;
     }
 
     public String getClientId() {
