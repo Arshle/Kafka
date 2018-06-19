@@ -1,2 +1,14 @@
 # Kafka
 Kafka二次开发封装
+使用方法:
+所有消息实体类必须继承BaseSimpleMessage或BaseConcurrencyMessage
+生产者引用kafka-producer依赖，然后使用KafkaSender.send/KafkaSender.conrruentSend
+方法即可发送消息,最简配置是需要在application.yaml中加入kafka的连接地址以及zookeeper的
+连接地址,如项目中nbiot-kafka配置文件中配置，其余关于kafka生产者的配置名称都在KafkaProducerConfiguration
+类中，根据需要修改kafka生产者所需的配置
+消费者引用kafka-consumer依赖，然后在需要类中实现KafkaMessageListener接口并实现onMessage
+方法，在类中加入@KafkaListener注解，注解可以加入topic、group、partitions值，对应消费
+者的属性，消费者最简配置仅需要配置kafka的连接地址，同生产者，其余消费者配置名称在KafkaConsumerConfiguration
+中，可以根据需要修改消费者配置,消费者例子在TestKafkaListener中
+
+

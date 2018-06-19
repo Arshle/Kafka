@@ -16,18 +16,15 @@ import com.jsptpd.kafka.common.utils.StringUtils;
 import com.jsptpd.kafka.configuration.KafkaConsumerConfiguration;
 import com.jsptpd.kafka.intf.KafkaMessageListener;
 import com.jsptpd.kafka.thread.ConsumerThreadUtils;
-import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -71,12 +68,13 @@ public class MessageListenerScanner implements BeanPostProcessor {
                 //kafka消费者必须实现KafkaMessageListener接口
                 if (intf.isAssignableFrom(KafkaMessageListener.class)){
                     isValid = true;
-                    TypeVariable<? extends Class<?>>[] parameters = intf.getTypeParameters();
-                    //获取消息类型
-                    for(TypeVariable<?> parameter : parameters){
+                    Type[] types = clazz.getGenericInterfaces();
+                    for(Type type : types){
                         try {
-                            Type messageType = parameter.getBounds()[0];
-                            messageClass = Class.forName(messageType.getTypeName());
+                            if(type instanceof ParameterizedType){
+                                ParameterizedType parameterizedType = (ParameterizedType) type;
+                                messageClass = (Class<?>)parameterizedType.getActualTypeArguments()[0];
+                            }
                         } catch (Exception e) {
                             logger.error(e.getMessage(),e);
                         }
@@ -101,6 +99,13 @@ public class MessageListenerScanner implements BeanPostProcessor {
     private void startConsumers(KafkaMessageListener messageListener, Class<? extends KafkaMessage> messageClass, KafkaListener listener){
         ThreadPoolExecutor executor = ConsumerThreadUtils.getThreadPoolExecutor();
         KafkaConsumerConfiguration consumerConfs = SpringUtils.getBean(KafkaConsumerConfiguration.class);
+        //消费者分组
+        String groupId = listener.group();
+        if(StringUtils.isNotEmpty(groupId)){
+            consumerConfs.setGroupId(groupId);
+        }else{
+            consumerConfs.setGroupId(StringUtils.getUUID());
+        }
         Properties consumerProps = KafkaConsumerConfiguration.getConsumerConf();
         //并发数控制在2倍CPU核心数以内
         if (consumerConfs.getConcurrencyConsumer() < 1
@@ -113,13 +118,6 @@ public class MessageListenerScanner implements BeanPostProcessor {
             topic = consumerConfs.getDefaultTopic();
         }else{
             topic = listener.topic();
-        }
-        //消费者分组
-        String groupId = listener.group();
-        if(StringUtils.isNotEmpty(groupId)){
-            consumerConfs.setGroupId(groupId);
-        }else{
-            consumerConfs.setGroupId(StringUtils.getUUID());
         }
         //分区汇总
         int partitionLength = listener.partitions().length;
@@ -142,15 +140,19 @@ public class MessageListenerScanner implements BeanPostProcessor {
                             //提交偏移量
                             consumer.commitSync();
                         }
-
                         @Override
                         public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
                             //已经消费的偏移量
                             long committedOffset;
-                            for(TopicPartition partition : partitions){
-                                //回退至已经消费的偏移量下一个位置
-                                committedOffset = consumer.committed(partition).offset();
-                                consumer.seek(partition,committedOffset + 1);
+                            if(partitions != null){
+                                for(TopicPartition partition : partitions){
+                                    //回退至已经消费的偏移量下一个位置
+                                    OffsetAndMetadata offsetAndMetadata = consumer.committed(partition);
+                                    if(offsetAndMetadata != null){
+                                        committedOffset = offsetAndMetadata.offset();
+                                        consumer.seek(partition,committedOffset + 1);
+                                    }
+                                }
                             }
                         }
                     });
@@ -160,7 +162,7 @@ public class MessageListenerScanner implements BeanPostProcessor {
                     ConsumerRecords<String, String> records = consumer.poll(1000);
                     for(ConsumerRecord<String,String> record : records){
                         try {
-                            logger.info("接收kafka消息|topic:" + record.topic() + "|partition:" + record.partition() + "|key:" + record.key() + "|value:" + record.value() + "|timestamp:" + record.timestamp());
+                            logger.info("接收kafka消息|topic:" + record.topic() + "|offset:" + record.offset() + "|partition:" + record.partition() + "|key:" + record.key() + "|value:" + record.value() + "|timestamp:" + record.timestamp());
                             //转化消息并执行消息监听器的方法
                             KafkaMessage message = JSON.parseObject(record.value(), messageClass);
                             messageListener.onMessage(message);

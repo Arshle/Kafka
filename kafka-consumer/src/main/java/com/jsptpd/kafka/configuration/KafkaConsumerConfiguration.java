@@ -26,17 +26,17 @@ public class KafkaConsumerConfiguration {
     /**
      * kafka连接地址
      */
-    @Value("${kafka.connect.addr:\"\"}")
+    @Value("${kafka.connect.addr:}")
     private String kafkaAddr;
     /**
      * 消费者所属组
      */
-    @Value("${kafka.group.id:\"\"}")
+    @Value("${kafka.group.id:}")
     private String groupId;
     /**
      * 客户端编号
      */
-    @Value("${kafka.client.id:\"\"}")
+    @Value("${kafka.client.id:}")
     private String clientId;
     /**
      * 每次抓取消息的最大字节数
@@ -106,7 +106,7 @@ public class KafkaConsumerConfiguration {
     /**
      * 分区流分配策略
      */
-    @Value("${kafka.paritition.assignment.strategy:range}")
+    @Value("${kafka.paritition.assignment.strategy:org.apache.kafka.clients.consumer.RangeAssignor}")
     private String partitionAssignmentStrategy;
     /**
      * 重试之前时间
@@ -156,6 +156,7 @@ public class KafkaConsumerConfiguration {
             KafkaConsumerConfiguration consumerConf = SpringUtils.getBean(KafkaConsumerConfiguration.class);
             CONSUMER_PROPS.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,consumerConf.getKafkaAddr());
             CONSUMER_PROPS.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,consumerConf.getKeyDeserializer());
+            CONSUMER_PROPS.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, consumerConf.getValueDeserializer());
             CONSUMER_PROPS.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG,consumerConf.getAutoCommitInterval());
             CONSUMER_PROPS.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,consumerConf.getAutoOffsetReset());
             CONSUMER_PROPS.put(ConsumerConfig.CLIENT_ID_CONFIG,consumerConf.getClientId());
@@ -174,7 +175,7 @@ public class KafkaConsumerConfiguration {
             CONSUMER_PROPS.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, consumerConf.getReceiveBufferBytes());
             CONSUMER_PROPS.put(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, consumerConf.getReconnectBackoff());
             CONSUMER_PROPS.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, consumerConf.getRequestTimeout());
-            CONSUMER_PROPS.put(ConsumerConfig.RETRY_BACKOFF_MS_CONFIG,consumerConf);
+            CONSUMER_PROPS.put(ConsumerConfig.RETRY_BACKOFF_MS_CONFIG,consumerConf.getRetryBackoff());
 
         }
         return CONSUMER_PROPS;

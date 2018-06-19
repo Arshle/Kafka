@@ -23,12 +23,12 @@ public class KafkaProducerConfiguration {
     /**
      * kafka连接地址
      */
-    @Value("${kafka.connect.addr:\"\"}")
+    @Value("${kafka.connect.addr:}")
     private String kafkaAddr;
     /**
      * zookeeper连接地址
      */
-    @Value("${zookeeper.connect.addr:\"\"}")
+    @Value("${zookeeper.connect.addr:}")
     private String zkAddr;
     /**
      * zookeeper会话超时时间
@@ -78,7 +78,7 @@ public class KafkaProducerConfiguration {
     /**
      * 生产者标识
      */
-    @Value("${kafka.client.id:\"\"}")
+    @Value("${kafka.client.id:}")
     private String clientId;
     /**
      * 压缩类型

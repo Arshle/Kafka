@@ -15,14 +15,11 @@ public class NbiotKafkaApplicationTests {
 
     @Test
     public void contextLoads() throws ExecutionException, InterruptedException {
-        /*CloudMessage message = new CloudMessage();
+        CloudMessage message = new CloudMessage();
         message.setBranchName("DRAGON-1672");
-        message.setDescription("test");
-        message.setDomain("mychebao.com");
-        message.setMessageType(KafkaMessageType.NB_IOT);
-        message.setMessageId(2);
-        message.addProperty("test","a");
-        KafkaSender.concurrentSend(message);*/
+        message.setDomain("jsptpd.com");
+        message.setDescription("测试消息");
+        KafkaSender.sendByPartition("jsptpd", 0, message);
         Thread.sleep(Integer.MAX_VALUE);
 //        Future<RecordMetadata> future = KafkaSender.send(message);
 //        RecordMetadata metadata = future.get();
