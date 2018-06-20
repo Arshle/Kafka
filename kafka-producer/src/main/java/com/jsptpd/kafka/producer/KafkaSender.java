@@ -23,6 +23,7 @@ import scala.collection.Map;
 import scala.collection.Seq;
 import java.util.Properties;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -41,9 +42,9 @@ public class KafkaSender {
      */
     private static class KafkaProducerInner{
         /**
-         * kafka生产者
+         * 生产者配置
          */
-        private static KafkaProducer<String,String> producer;
+        private static Properties producerProps;
 
         static{
             //初始化kafka生产者
@@ -57,29 +58,27 @@ public class KafkaSender {
                 //加载kafka连接配置
                 KafkaProducerConfiguration kafkaConf = SpringUtils.getBean(KafkaProducerConfiguration.class);
                 //初始化生产者
-                Properties props = new Properties();
-                props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaConf.getKafkaAddr());
-                props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafkaConf.getKeySerializer());
-                props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafkaConf.getValueSerializer());
-                props.put(ProducerConfig.ACKS_CONFIG,kafkaConf.getAcks());
-                props.put(ProducerConfig.BATCH_SIZE_CONFIG,kafkaConf.getBatchSize());
-                props.put(ProducerConfig.BUFFER_MEMORY_CONFIG,kafkaConf.getBufferMemory());
-                props.put(ProducerConfig.CLIENT_ID_CONFIG, kafkaConf.getClientId());
-                props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, kafkaConf.getCompressType());
-                props.put(ProducerConfig.CONNECTIONS_MAX_IDLE_MS_CONFIG, kafkaConf.getConnectMaxIdleTime());
-                props.put(ProducerConfig.LINGER_MS_CONFIG, kafkaConf.getLingerTime());
-                props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG,kafkaConf.getMaxBlockTime());
-                props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, kafkaConf.getMaxRequestSize());
-                props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, kafkaConf.getPartitionerClass());
-                props.put(ProducerConfig.RECEIVE_BUFFER_CONFIG, kafkaConf.getReceiveBufferBytes());
-                props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, kafkaConf.getRequestTimeout());
-                props.put(ProducerConfig.RETRIES_CONFIG, kafkaConf.getRetries());
-                props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION,kafkaConf.getMaxInFlightRequestsPerConnection());
-                props.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, kafkaConf.getRetryBackOffTime());
-                producer = new KafkaProducer<>(props);
+                producerProps = new Properties();
+                producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaConf.getKafkaAddr());
+                producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafkaConf.getKeySerializer());
+                producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafkaConf.getValueSerializer());
+                producerProps.put(ProducerConfig.ACKS_CONFIG,kafkaConf.getAcks());
+                producerProps.put(ProducerConfig.BATCH_SIZE_CONFIG,kafkaConf.getBatchSize());
+                producerProps.put(ProducerConfig.BUFFER_MEMORY_CONFIG,kafkaConf.getBufferMemory());
+                producerProps.put(ProducerConfig.CLIENT_ID_CONFIG, kafkaConf.getClientId());
+                producerProps.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, kafkaConf.getCompressType());
+                producerProps.put(ProducerConfig.CONNECTIONS_MAX_IDLE_MS_CONFIG, kafkaConf.getConnectMaxIdleTime());
+                producerProps.put(ProducerConfig.LINGER_MS_CONFIG, kafkaConf.getLingerTime());
+                producerProps.put(ProducerConfig.MAX_BLOCK_MS_CONFIG,kafkaConf.getMaxBlockTime());
+                producerProps.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, kafkaConf.getMaxRequestSize());
+                producerProps.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, kafkaConf.getPartitionerClass());
+                producerProps.put(ProducerConfig.RECEIVE_BUFFER_CONFIG, kafkaConf.getReceiveBufferBytes());
+                producerProps.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, kafkaConf.getRequestTimeout());
+                producerProps.put(ProducerConfig.RETRIES_CONFIG, kafkaConf.getRetries());
+                producerProps.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION,kafkaConf.getMaxInFlightRequestsPerConnection());
+                producerProps.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, kafkaConf.getRetryBackOffTime());
             } catch (Exception e) {
-                logger.error("初始化kafka生产者异常",e);
-                producer = null;
+                logger.error("初始化kafka生产者配置异常",e);
             }
 
         }
@@ -104,8 +103,8 @@ public class KafkaSender {
      * 获取kafka生产者
      * @return 生产者
      */
-    private static KafkaProducer<String,String> getProducer(){
-        return KafkaProducerInner.producer;
+    private static Properties getProducerProps(){
+        return KafkaProducerInner.producerProps;
     }
     /**
      * 创建主题
@@ -274,17 +273,15 @@ public class KafkaSender {
             return null;
         }
         Future<RecordMetadata> future = null;
-        try (KafkaProducer<String,String> producer = getProducer()) {
+        try (KafkaProducer<String,String> producer = new KafkaProducer<>(getProducerProps())) {
             String uuid = StringUtils.getUUID();
             long now = System.currentTimeMillis();
             //构建消息记录
             ProducerRecord<String,String> record = new ProducerRecord<>(topic,
                     partition, now, uuid, message.toString());
             //发送消息
-            if(producer != null){
-                future = producer.send(record);
-                logger.info("发送kafka数据|topic:" + topic + "|partition:" + partition + "|key:" + uuid + "|value:" + message.toString() + "|timestamp:" + now);
-            }
+            future = producer.send(record);
+            logger.info("发送kafka数据|topic:" + topic + "|partition:" + partition + "|key:" + uuid + "|value:" + message.toString() + "|timestamp:" + now);
         } catch (Exception e) {
             logger.error("发送kafka数据异常",e);
         }
@@ -294,7 +291,7 @@ public class KafkaSender {
      * 并发发送kafka消息
      * @param message 消息体
      */
-    public static void concurrentSend(KafkaMessage message){
+    public static void concurrentSend(KafkaMessage message) throws RejectedExecutionException{
         concurrentSend(message,null);
     }
     /**
@@ -302,7 +299,7 @@ public class KafkaSender {
      * @param message 消息体
      * @param callback 回调接口
      */
-    public static void concurrentSend(KafkaMessage message,Callback callback){
+    public static void concurrentSend(KafkaMessage message,Callback callback) throws RejectedExecutionException{
         KafkaProducerConfiguration kafkaConf = SpringUtils.getBean(KafkaProducerConfiguration.class);
         concurrentSendByPartitions(kafkaConf.getDefaultTopic(),null,message,callback);
     }
@@ -311,7 +308,7 @@ public class KafkaSender {
      * @param topic 主题名称
      * @param message 消息体
      */
-    public static void concurrentSend(String topic,KafkaMessage message){
+    public static void concurrentSend(String topic,KafkaMessage message) throws RejectedExecutionException{
         concurrentSendByPartitions(topic,null,message);
     }
     /**
@@ -320,7 +317,7 @@ public class KafkaSender {
      * @param message 消息体
      * @param callback 回调接口
      */
-    public static void concurrentSend(String topic,KafkaMessage message,Callback callback){
+    public static void concurrentSend(String topic,KafkaMessage message,Callback callback) throws RejectedExecutionException{
         concurrentSendByPartitions(topic,null,message,callback);
     }
     /**
@@ -328,7 +325,7 @@ public class KafkaSender {
      * @param partition 分区编号
      * @param message 消息体
      */
-    public static void concurrentSendByPartitions(Integer partition,KafkaMessage message){
+    public static void concurrentSendByPartitions(Integer partition,KafkaMessage message) throws RejectedExecutionException{
         concurrentSendByPartitions(partition,message,null);
     }
     /**
@@ -337,7 +334,7 @@ public class KafkaSender {
      * @param message 消息体
      * @param callback 回调接口
      */
-    public static void concurrentSendByPartitions(Integer partition,KafkaMessage message,Callback callback){
+    public static void concurrentSendByPartitions(Integer partition,KafkaMessage message,Callback callback) throws RejectedExecutionException{
         KafkaProducerConfiguration kafkaConf = SpringUtils.getBean(KafkaProducerConfiguration.class);
         concurrentSendByPartitions(kafkaConf.getDefaultTopic(),partition,message,callback);
     }
@@ -347,7 +344,7 @@ public class KafkaSender {
      * @param partition 分区编号
      * @param message 消息体
      */
-    public static void concurrentSendByPartitions(String topic, Integer partition, KafkaMessage message){
+    public static void concurrentSendByPartitions(String topic, Integer partition, KafkaMessage message) throws RejectedExecutionException{
         concurrentSendByPartitions(topic,partition,message,null);
     }
     /**
@@ -356,24 +353,22 @@ public class KafkaSender {
      * @param partition 分区编号
      * @param message 消息体
      */
-    public static void concurrentSendByPartitions(String topic, Integer partition, KafkaMessage message, Callback callback){
+    public static void concurrentSendByPartitions(String topic, Integer partition, KafkaMessage message, Callback callback) throws RejectedExecutionException {
         if(StringUtils.isEmpty(topic) || message == null){
             logger.warn("kafka主题或消息为空");
             return;
         }
         ThreadPoolExecutor executor = ProducerThreadUtils.getThreadPoolExecutor();
         executor.execute(() -> {
-            try (KafkaProducer<String,String> producer = getProducer()) {
+            try (KafkaProducer<String,String> producer = new KafkaProducer<>(getProducerProps())) {
                 String uuid = StringUtils.getUUID();
                 long now = System.currentTimeMillis();
                 //构建消息记录
                 ProducerRecord<String,String> record = new ProducerRecord<>(topic,
                         partition, now, uuid, message.toString());
                 //发送消息
-                if(producer != null){
-                    producer.send(record,callback);
-                    logger.info("发送kafka数据|topic:" + topic + "|partition:" + partition + "|key:" + uuid + "|value:" + message.toString() + "|timestamp:" + now);
-                }
+                producer.send(record,callback);
+                logger.info("发送kafka数据|topic:" + topic + "|partition:" + partition + "|key:" + uuid + "|value:" + message.toString() + "|timestamp:" + now);
             } catch (Exception e) {
                 logger.error("发送kafka数据异常",e);
             }

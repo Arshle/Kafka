@@ -9,7 +9,7 @@ package com.jsptpd.kafka.consumer;
 import com.jsptpd.kafka.annotation.KafkaListener;
 import com.jsptpd.kafka.common.entity.message.CloudMessage;
 import com.jsptpd.kafka.intf.KafkaMessageListener;
-import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 〈〉<br>
@@ -20,11 +20,12 @@ import java.io.Serializable;
  * @since [产品/模块版本]（可选）
  */
 @KafkaListener(topic = "jsptpd",group = "test")
-public class TestKafkaListener implements Serializable,KafkaMessageListener<CloudMessage> {
-    private static final long serialVersionUID = 2905769438069905468L;
+public class TestKafkaListener implements KafkaMessageListener<CloudMessage> {
 
+    private static final AtomicInteger COUNT = new AtomicInteger();
     @Override
     public void onMessage(CloudMessage message) {
-        System.out.println(message.getBranchName() + "|" + message.getDescription() + "|" + message.getDomain());
+        System.out.println(message.getBranchName() + "|" + message.getDescription() + "|" + message.getDomain() + "|" + message.getIngressIp() + "|" + message.getCreationTime());
+        System.out.println("receive " + COUNT.incrementAndGet() + " kafka message");
     }
 }

@@ -95,8 +95,8 @@ public class ProducerThreadUtils {
                 logger.info(e.getMessage(),e);
                 coreSize = Runtime.getRuntime().availableProcessors() * 2;
             }
-            threadPoolExecutor = new ThreadPoolExecutor(coreSize, coreSize * 2, 0L,
-                    TimeUnit.SECONDS, new LinkedBlockingQueue<>(coreSize), THREAD_FACTORY, new ThreadPoolExecutor.AbortPolicy());
+            threadPoolExecutor = new ThreadPoolExecutor(coreSize, coreSize * 100, 0L,
+                    TimeUnit.SECONDS, new LinkedBlockingQueue<>(coreSize * 100), THREAD_FACTORY, new ThreadPoolExecutor.AbortPolicy());
         }
     }
     /**
