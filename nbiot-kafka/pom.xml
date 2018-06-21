@@ -22,8 +22,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <kafka.producer.version>1.0-SNAPSHOT</kafka.producer.version>
-        <kafka.consumer.version>1.0-SNAPSHOT</kafka.consumer.version>
+        <kafka.producer.version>1.0.0-SNAPSHOT</kafka.producer.version>
+        <kafka.consumer.version>1.0.0-SNAPSHOT</kafka.consumer.version>
     </properties>
     <!--properties-->
     <dependencies>

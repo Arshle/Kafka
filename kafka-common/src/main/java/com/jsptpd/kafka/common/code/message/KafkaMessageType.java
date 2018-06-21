@@ -20,6 +20,7 @@ public enum KafkaMessageType {
      */
     NB_IOT(1,"NB-IoT通信消息"),
     LoRa(2,"LoRa通信消息"),
+    CONFIG(3,"统一配置消息"),
     ;
 
     KafkaMessageType(int type,String description){
