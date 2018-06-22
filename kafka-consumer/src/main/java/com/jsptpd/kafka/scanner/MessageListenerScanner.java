@@ -6,7 +6,7 @@
  */
 package com.jsptpd.kafka.scanner;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsptpd.kafka.annotation.KafkaListener;
 import com.jsptpd.kafka.common.code.message.KafkaBaseExceptionType;
 import com.jsptpd.kafka.common.exception.KafkaBaseException;
@@ -164,7 +164,8 @@ public class MessageListenerScanner implements BeanPostProcessor {
                         try {
                             logger.info("接收kafka消息|topic:" + record.topic() + "|offset:" + record.offset() + "|partition:" + record.partition() + "|key:" + record.key() + "|value:" + record.value() + "|timestamp:" + record.timestamp());
                             //转化消息并执行消息监听器的方法
-                            KafkaMessage message = JSON.parseObject(record.value(), messageClass);
+                            ObjectMapper mapper = new ObjectMapper();
+                            KafkaMessage message = mapper.readValue(record.value(), messageClass);
                             messageListener.onMessage(message);
                         } catch (Exception e) {
                             logger.error("接受kafka消息异常",e);

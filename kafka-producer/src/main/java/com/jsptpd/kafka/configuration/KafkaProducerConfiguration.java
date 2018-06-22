@@ -6,7 +6,8 @@
  */
 package com.jsptpd.kafka.configuration;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -337,6 +338,10 @@ public class KafkaProducerConfiguration {
 
     @Override
     public String toString() {
-        return JSON.toJSONString(this);
+        try {
+            return new ObjectMapper().writeValueAsString(this);
+        } catch (Exception e) {
+            return "jackson write error.";
+        }
     }
 }

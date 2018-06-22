@@ -6,6 +6,7 @@
  */
 package com.jsptpd.kafka.producer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsptpd.kafka.configuration.KafkaProducerConfiguration;
 import com.jsptpd.kafka.common.intf.message.KafkaMessage;
 import com.jsptpd.kafka.common.utils.SpringUtils;
@@ -273,15 +274,18 @@ public class KafkaSender {
             return null;
         }
         Future<RecordMetadata> future = null;
-        try (KafkaProducer<String,String> producer = new KafkaProducer<>(getProducerProps())) {
+        try {
+            KafkaProducer<String,String> producer = new KafkaProducer<>(getProducerProps());
             String uuid = StringUtils.getUUID();
             long now = System.currentTimeMillis();
             //构建消息记录
+            ObjectMapper mapper = new ObjectMapper();
+            String recordStr = mapper.writeValueAsString(message);
             ProducerRecord<String,String> record = new ProducerRecord<>(topic,
-                    partition, now, uuid, message.toString());
+                    partition, now, uuid, recordStr);
             //发送消息
             future = producer.send(record);
-            logger.info("发送kafka数据|topic:" + topic + "|partition:" + partition + "|key:" + uuid + "|value:" + message.toString() + "|timestamp:" + now);
+            logger.info("发送kafka数据|topic:" + topic + "|partition:" + partition + "|key:" + uuid + "|value:" + recordStr + "|timestamp:" + now);
         } catch (Exception e) {
             logger.error("发送kafka数据异常",e);
         }
@@ -360,15 +364,18 @@ public class KafkaSender {
         }
         ThreadPoolExecutor executor = ProducerThreadUtils.getThreadPoolExecutor();
         executor.execute(() -> {
-            try (KafkaProducer<String,String> producer = new KafkaProducer<>(getProducerProps())) {
+            try {
+                KafkaProducer<String,String> producer = new KafkaProducer<>(getProducerProps());
                 String uuid = StringUtils.getUUID();
                 long now = System.currentTimeMillis();
                 //构建消息记录
+                ObjectMapper mapper = new ObjectMapper();
+                String recordStr = mapper.writeValueAsString(message);
                 ProducerRecord<String,String> record = new ProducerRecord<>(topic,
-                        partition, now, uuid, message.toString());
+                        partition, now, uuid, recordStr);
                 //发送消息
                 producer.send(record,callback);
-                logger.info("发送kafka数据|topic:" + topic + "|partition:" + partition + "|key:" + uuid + "|value:" + message.toString() + "|timestamp:" + now);
+                logger.info("发送kafka数据|topic:" + topic + "|partition:" + partition + "|key:" + uuid + "|value:" + recordStr + "|timestamp:" + now);
             } catch (Exception e) {
                 logger.error("发送kafka数据异常",e);
             }

@@ -6,7 +6,8 @@
  */
 package com.jsptpd.nbiot.listener;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsptpd.kafka.annotation.KafkaListener;
 import com.jsptpd.kafka.intf.KafkaMessageListener;
 import com.jsptpd.nbiot.entity.UpdateDevDataNotify;
@@ -28,6 +29,11 @@ public class TestKafkaListener implements KafkaMessageListener<UpdateDevDataNoti
 
     @Override
     public void onMessage(UpdateDevDataNotify message) {
-        System.out.println("接受kafka消息:" + JSON.toJSONString(message));
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            System.out.println("接受kafka消息:" + mapper.writeValueAsString(message));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -6,7 +6,7 @@
  */
 package com.jsptpd.kafka.configuration;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsptpd.kafka.common.utils.SpringUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.springframework.beans.factory.annotation.Value;
@@ -377,6 +377,10 @@ public class KafkaConsumerConfiguration {
 
     @Override
     public String toString() {
-        return JSON.toJSONString(this);
+        try {
+            return new ObjectMapper().writeValueAsString(this);
+        } catch (Exception e) {
+            return "jackson write error.";
+        }
     }
 }

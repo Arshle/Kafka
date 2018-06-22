@@ -6,7 +6,8 @@
  */
 package com.jsptpd.kafka.common.entity.message;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsptpd.kafka.common.code.message.KafkaMessageType;
 import com.jsptpd.kafka.common.intf.message.KafkaMessage;
 import java.util.Date;
@@ -61,6 +62,10 @@ public abstract class AbstractBaseMessage implements KafkaMessage {
 
     @Override
     public String toString() {
-        return JSON.toJSONString(this);
+        try {
+            return new ObjectMapper().writeValueAsString(this);
+        } catch (Exception e) {
+            return "jackson write error.";
+        }
     }
 }
