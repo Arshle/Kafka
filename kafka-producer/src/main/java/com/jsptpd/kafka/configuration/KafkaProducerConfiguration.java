@@ -6,7 +6,6 @@
  */
 package com.jsptpd.kafka.configuration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -39,7 +38,7 @@ public class KafkaProducerConfiguration {
     /**
      * zookeeper连接超时时间
      */
-    @Value("${zookeeper.connect.timeout:30000}")
+    @Value("${zookeeper.connect.timeout:5000}")
     private int zkConnectTimeout;
     /**
      * kafka消息key编码
@@ -137,10 +136,10 @@ public class KafkaProducerConfiguration {
     @Value("${kafka.retry.backoff.ms:100}")
     private long retryBackOffTime;
     /**
-     * 并发发送消息数量
+     * 生产者线程池容量
      */
-    @Value("${kafka.concurrency.send:3}")
-    private int concurrencySend;
+    @Value("${kafka.concurrency.senderPoolSize:500}")
+    private int senderPoolSize;
     /**
      * Getters、Setters
      */
@@ -328,12 +327,12 @@ public class KafkaProducerConfiguration {
         this.retryBackOffTime = retryBackOffTime;
     }
 
-    public int getConcurrencySend() {
-        return concurrencySend;
+    public int getSenderPoolSize() {
+        return senderPoolSize;
     }
 
-    public void setConcurrencySend(int concurrencySend) {
-        this.concurrencySend = concurrencySend;
+    public void setSenderPoolSize(int senderPoolSize) {
+        this.senderPoolSize = senderPoolSize;
     }
 
     @Override

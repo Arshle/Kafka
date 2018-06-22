@@ -90,13 +90,13 @@ public class ProducerThreadUtils {
             int coreSize;
             try {
                 KafkaProducerConfiguration kafkaConf = SpringUtils.getBean(KafkaProducerConfiguration.class);
-                coreSize = kafkaConf.getConcurrencySend();
+                coreSize = kafkaConf.getSenderPoolSize();
             } catch (Exception e) {
                 logger.info(e.getMessage(),e);
                 coreSize = Runtime.getRuntime().availableProcessors() * 2;
             }
-            threadPoolExecutor = new ThreadPoolExecutor(coreSize, coreSize * 100, 0L,
-                    TimeUnit.SECONDS, new LinkedBlockingQueue<>(coreSize * 100), THREAD_FACTORY, new ThreadPoolExecutor.AbortPolicy());
+            threadPoolExecutor = new ThreadPoolExecutor(coreSize, coreSize * 2, 0L,
+                    TimeUnit.SECONDS, new LinkedBlockingQueue<>(coreSize), THREAD_FACTORY, new ThreadPoolExecutor.AbortPolicy());
         }
     }
     /**

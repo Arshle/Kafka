@@ -6,12 +6,10 @@
  */
 package com.jsptpd.nbiot.listener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsptpd.kafka.annotation.KafkaListener;
 import com.jsptpd.kafka.intf.KafkaMessageListener;
 import com.jsptpd.nbiot.entity.UpdateDevDataNotify;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -32,6 +30,7 @@ public class TestKafkaListener implements KafkaMessageListener<UpdateDevDataNoti
         ObjectMapper mapper = new ObjectMapper();
         try {
             System.out.println("接受kafka消息:" + mapper.writeValueAsString(message));
+            System.out.println("总计接受消息:" + COUNT.incrementAndGet());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,7 +1,7 @@
 package com.jsptpd.nbiot;
 
-import com.jsptpd.kafka.common.entity.message.CloudMessage;
 import com.jsptpd.kafka.producer.KafkaSender;
+import com.jsptpd.nbiot.entity.UpdateDevDataNotify;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,14 +13,14 @@ public class NbiotKafkaApplicationTests {
 
     @Test
     public void contextLoads() throws InterruptedException {
-        /*for(int i = 0; i < 500; i ++){
-            CloudMessage message = new CloudMessage();
-            message.setBranchName("DRAGON-" + i);
-            message.setDomain("sit" + i + ".jsptpd.com");
-            message.setDescription("测试消息" + i);
-            message.setIngressIp("172.16.12." + i);
-            KafkaSender.send("jsptpd",message);
-        }*/
+        for(int i = 0; i < 1000; i ++){
+            UpdateDevDataNotify notify = new UpdateDevDataNotify();
+            notify.setDeviceId("1234555" + i);
+            notify.setGatewayId("ssdsd455" + i);
+            notify.setRequestId("adsadsad" + i);
+            notify.setNotifyType("sasas" + i);
+            KafkaSender.concurrentSend("iotsz",notify);
+        }
         /*CloudMessage message = new CloudMessage();
         message.setBranchName("DRAGON-1");
         message.setDomain("sit1.jsptpd.com");

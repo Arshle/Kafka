@@ -43,9 +43,9 @@ public class KafkaSender {
      */
     private static class KafkaProducerInner{
         /**
-         * 生产者配置
+         * 生产者
          */
-        private static Properties producerProps;
+        private static KafkaProducer<String,String> producer;
 
         static{
             //初始化kafka生产者
@@ -59,7 +59,7 @@ public class KafkaSender {
                 //加载kafka连接配置
                 KafkaProducerConfiguration kafkaConf = SpringUtils.getBean(KafkaProducerConfiguration.class);
                 //初始化生产者
-                producerProps = new Properties();
+                Properties producerProps = new Properties();
                 producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaConf.getKafkaAddr());
                 producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafkaConf.getKeySerializer());
                 producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafkaConf.getValueSerializer());
@@ -78,6 +78,7 @@ public class KafkaSender {
                 producerProps.put(ProducerConfig.RETRIES_CONFIG, kafkaConf.getRetries());
                 producerProps.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION,kafkaConf.getMaxInFlightRequestsPerConnection());
                 producerProps.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, kafkaConf.getRetryBackOffTime());
+                producer = new KafkaProducer<>(producerProps);
             } catch (Exception e) {
                 logger.error("初始化kafka生产者配置异常",e);
             }
@@ -104,8 +105,8 @@ public class KafkaSender {
      * 获取kafka生产者
      * @return 生产者
      */
-    private static Properties getProducerProps(){
-        return KafkaProducerInner.producerProps;
+    private static KafkaProducer<String, String> getProducer(){
+        return KafkaProducerInner.producer;
     }
     /**
      * 创建主题
@@ -275,7 +276,7 @@ public class KafkaSender {
         }
         Future<RecordMetadata> future = null;
         try {
-            KafkaProducer<String,String> producer = new KafkaProducer<>(getProducerProps());
+            KafkaProducer<String,String> producer = getProducer();
             String uuid = StringUtils.getUUID();
             long now = System.currentTimeMillis();
             //构建消息记录
@@ -365,7 +366,7 @@ public class KafkaSender {
         ThreadPoolExecutor executor = ProducerThreadUtils.getThreadPoolExecutor();
         executor.execute(() -> {
             try {
-                KafkaProducer<String,String> producer = new KafkaProducer<>(getProducerProps());
+                KafkaProducer<String,String> producer = getProducer();
                 String uuid = StringUtils.getUUID();
                 long now = System.currentTimeMillis();
                 //构建消息记录
