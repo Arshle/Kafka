@@ -1,6 +1,9 @@
 # Kafka
 Kafka二次开发封装
 使用方法:
+spring boot的启动类Application需要加上扫描注解
+@ComponentScan({"com.jsptpd.kafka","com.xxxxx.xxxxx"})
+并且com.jsptpd.kafka包的扫描要在业务组件扫描之前
 所有消息实体类必须继承BaseSimpleMessage或BaseConcurrencyMessage
 生产者引用kafka-producer依赖，然后使用KafkaSender.send/KafkaSender.conrruentSend
 方法即可发送消息,最简配置是需要在application.yaml中加入kafka的连接地址以及zookeeper的
