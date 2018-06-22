@@ -6,7 +6,6 @@
  */
 package com.jsptpd.kafka.common.entity.message;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jsptpd.kafka.common.code.message.KafkaMessageType;
 import com.jsptpd.kafka.common.intf.message.KafkaMessage;
@@ -24,7 +23,7 @@ public abstract class AbstractBaseMessage implements KafkaMessage {
     /**
      * 消息编号
      */
-    private long messageId;
+    private String messageId;
     /**
      * 消息类型
      */
@@ -36,11 +35,11 @@ public abstract class AbstractBaseMessage implements KafkaMessage {
     /**
      * Getters、Setters
      */
-    public long getMessageId() {
+    public String getMessageId() {
         return messageId;
     }
 
-    public void setMessageId(long messageId) {
+    public void setMessageId(String messageId) {
         this.messageId = messageId;
     }
 
