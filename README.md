@@ -31,23 +31,23 @@ nbiot-kafka工程中的NbiotKafkaApplication:
   2.在spring boot配置文件或是spring工程配置文件中加入如下最简配置:
 kafka:
   connect:
-    addr: 172.16.11.105:9092,172.16.11.106:9092,172.16.11.107:9092
+    addr: node1:9092,node2:9092,node3:9092
 zookeeper:
   connect:
-    addr: 172.16.11.105:2181,172.16.11.106:2181,172.16.11.107:2181
+    addr: node1:2181,node2:2181,node3:2181
 以上配置为kafka和zookeeper的连接地址;
   3.若需要调优kafka其他生产者配置,参考配置类com.jsptpd.kafka.configuration.KafkaProducerConfiguration
 中的所有成员变量,例如如果需要修改请求kafka最大字节数量,参照配置类中的maxRequestSize
 字段,在spring boot或spring工程配置文件中新增名为kafka.max.request.size的配置:
 kafka:
   connect:
-    addr: 172.16.11.105:9092,172.16.11.106:9092,172.16.11.107:9092
+    addr: node1:9092,node2:9092,node3:9092
   max: 
     request: 
       size: 2097152
 zookeeper:
   connect:
-    addr: 172.16.11.105:2181,172.16.11.106:2181,172.16.11.107:2181
+    addr: node1:2181,node2:2181,node3:2181
   4.完成以上配置后保证kafka集群地址可用,使用com.jsptpd.kafka.producer.KafkaSender
 提供的相关API即可完成生产者操作,常用的为KafkaSender.send()或KafkaSender.concurrentSend(),
 若使用后者表示通过线程池并发发送kafka消息,并发量通过配置kafka.concurrency.senderPoolSize控制,
@@ -65,7 +65,7 @@ zookeeper:
   2.在spring boot配置文件或是spring工程配置文件中加入如下最简配置:
 kafka:
   connect:
-    addr: 172.16.11.105:9092,172.16.11.106:9092,172.16.11.107:9092
+    addr: node1:9092,node2:9092,node3:9092
 消费端不需要配置zookeeper地址;
   3.若需要调优kafka其他消费者配置,参考配置类com.jsptpd.kafka.configuration.KafkaConsumerConfiguration
 中的所有成员变量,修改方法同生产者
